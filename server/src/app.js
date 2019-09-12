@@ -1,0 +1,25 @@
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const morgan = require('morgan')
+
+const app = express()
+app.use(morgan('combined'))
+app.use(bodyParser.json())
+app.use(cors())
+
+const mongodb_conn_module = require('./mongodbConnModule');
+var db = mongodb_conn_module.connect();
+
+var Fundo = require("../models/fundo");
+
+app.get('/fundos', (req, res) => {
+  Fundo.find({}, 'text value', function (error, fundos) {
+	  if (error) { console.error(error); }
+	  res.send({
+			fundos: fundos
+		})
+	}).sort({_id:-1})
+})
+
+app.listen(process.env.PORT || 8081)
